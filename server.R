@@ -13,50 +13,115 @@ library(shinydashboard)
 library(shinythemes)
 library(rsconnect)
 
-source("full_subtests.R")
+source("subtests.R")
+source("main_scales.R")
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
     
     output$full_subtests_plot <- renderPlot({
       
-        # put validity in a dataframe
-        full_subtests_df <- data.frame(rbind(input$block_design, input$similiarities, input$digit_span, 
-                                        input$matrix_reasoning, input$vocabulary,
-                                        input$arithmetic, input$symbol_search, input$visual_puzzles, 
-                                        input$information, input$coding,
-                                        input$letter_number, input$figure_weights, input$comprehension, 
-                                        input$cancellation, 
-                                        input$picture_completion)) %>%
+        # put subtests in a dataframe
+        full_subtests_df <- data.frame(rbind(
+          input$similarities, input$vocabulary, input$information, input$comprehension,
+          input$block_design, input$matrix_reasoning, input$visual_puzzles, input$figure_weights, input$picture_completion,
+          input$digit_span, input$arithmetic, input$letter_number,
+          input$symbol_search, input$coding, input$cancellation)) %>%
           tibble::rownames_to_column(var = "scale") %>%
-          rename(scale_score = 2)
+          rename(scale_score = 2) %>%
+          mutate(scale_group = c("Verbal Comprehension", "Verbal Comprehension", "Verbal Comprehension", "Verbal Comprehension",
+                                 "Perceptual Reasoning", "Perceptual Reasoning", "Perceptual Reasoning", "Perceptual Reasoning", "Perceptual Reasoning", 
+                                 "Working Memory", "Working Memory", "Working Memory", 
+                                 "Processing Speed", "Processing Speed", "Processing Speed"))
         
-        # order scale variable
-        subtests_labels = c("Block Design", "Similiarities", "Digit Span", 
-        "Matrix Reasoning", "Vocabulary", "Arithmetic", "Symbol Search", "Visual Puzzles", 
-        "Information", "Coding", "Letter-Number Sequencing", "Figure Weights", "Comprehension",
-        "Cancellation", "Picture Completion")
+        full_subtests_df$scale_group = factor(full_subtests_df$scale_group,
+                                              levels = c("Verbal Comprehension", "Perceptual Reasoning", "Working Memory", "Processing Speed"))
         
+        full_subtests_df$gp <- c(1,1,1,1,2,2,2,2,2,3,3,3,4,4,4)
+                                 
+        # make ggplot labels
+        labels = c("SI", "VC", "IN", "(CO)",
+                            "BD", "MR", "VP", "(FW)", "(PCm)",
+                            "DS", "AR", "(LN)",
+                            "SS", "CD", "(CA)")
+        
+        names(labels) <- interaction(full_subtests_df$scale, factor(full_subtests_df$scale_group))
+
         # make a ggplot
         full_subtests_df %>%
-          ggplot(aes(x=scale, y=as.numeric(scale_score), group=1)) + # Group=1 connects points
+          ggplot(aes(x=interaction(scale, factor(scale_group)), y=as.numeric(scale_score), 
+                     label = (scale_group),
+                     group=interaction(scale_group, gp))) +
           theme_bw() +
-          geom_line() + 
-          geom_point(size=2) +
-          #geom_hline(yintercept=50) +
-          #geom_hline(yintercept=65) +
-          scale_y_continuous(sec.axis = dup_axis(), breaks = (seq(0, 20, by = 1)), limits = c(0,20)) +
-          scale_x_discrete(labels = subtests_labels) +
+          geom_line(stat="identity") + 
+          geom_point(size=2, color="blue") +
+          geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 9.5, ymax = 10.5),
+                    alpha = 0.015, fill = "darkturquoise") +
+          scale_y_continuous(breaks = (seq(0, 20, by = 1)), limits = c(0,20)) +
+          scale_x_discrete(position = "top", labels = labels) +
           xlab("") + ylab("") +
-          ggtitle("WAIS-IV Subtests") + theme(plot.title = element_text(hjust = 0.5))
+          ggtitle("WAIS-IV Subtest Scaled Score Profile") + theme(plot.title = element_text(hjust = 0.5)) +
+          facet_grid( ~ scale_group,
+                      scales = "free", space = "free")
         
     })
     
     output$full_subtests_down <- downloadHandler(
       filename = "full_subtests_plot.png",
       content = function(file){
-        ggsave(file, device = "png", width=7, height=3.5)
-      }
-    )
+        ggsave(file, device = "png", width=7, height=5)
+      
+    
+      })
+    
+    output$main_scales_plot <- renderPlot({
+      
+      # put main scales in a dataframe
+      main_scales_df <- data.frame(rbind(
+        input$vci, input$pri, input$wmi, input$psi,
+        input$fsiq, input$gai, input$cpi)) %>%
+        tibble::rownames_to_column(var = "scale") %>%
+        rename(scale_score = 2)
+      
+      # make ggplot labels
+      main_scale_labels = c("VCI", "PRI", "WMI", "PSI",
+                            "FSIQ", "GAI", "CPI")
+      
+      main_scales_df$gp <- c(1,1,1,1,
+                             2,3,4)
+      
+      # make a ggplot
+      main_scales_df %>%
+        ggplot(aes(x=scale, y=as.numeric(scale_score), group=gp)) +
+        theme_bw() +
+        geom_line(stat="identity") + 
+        geom_point(size=2, color="blue") +
+        geom_vline(xintercept = 4.5) +
+        geom_vline(xintercept = 9.5) +
+        geom_vline(xintercept = 12.5) + 
+        geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 99.5, ymax = 100.5),
+                  alpha = 0.015, fill = "darkturquoise") +
+        scale_y_continuous(breaks = (seq(35, 165, by = 5)), limits = c(35,165)) +
+        scale_x_discrete(position = "top", labels = unique(main_scale_labels)) +
+        xlab("") + ylab("") +
+        ggtitle("WAIS-IV Composite Score Profile") + theme(plot.title = element_text(hjust = 0.5)) 
+      
+    })
+    
+    output$main_scales_down <- downloadHandler(
+      filename = "main_scales_plot.png",
+      content = function(file){
+        ggsave(file, device = "png", width=7, height=5)
+        
+      })
 }
     
+
+# DO NOT ACTUALLY INLCLUDE THESE LINES IN THE FINAL PRODUCT!!!!
+# JUST COPY AND PASTE THEM DIRECTLY INTO YOUR CONSOLE!!!
+
+# Run the application 
+#shinyApp(ui = ui, server = server)
+
+# Deploy app
+#deployApp(appName="waisR", account="jrcalabrese")

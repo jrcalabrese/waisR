@@ -13,8 +13,10 @@ library(shinydashboard)
 library(shinythemes)
 library(rsconnect)
 
-source("full_subtests.R")
+source("subtests.R")
+source("main_scales.R")
 
 ui <- navbarPage("waisR by @jrosecalabrese", theme = shinytheme("flatly"),
-                 full_subtests
+                 subtests,
+                 main_scales
 )
