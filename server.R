@@ -88,7 +88,7 @@ server <- function(input, output) {
                             "FSIQ", "GAI", "CPI")
       
       main_scales_df$gp <- c(1,1,1,1,
-                             2,3,4)
+                             2,2,2)
       
       # make a ggplot
       main_scales_df %>%
