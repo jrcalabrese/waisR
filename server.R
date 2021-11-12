@@ -116,7 +116,7 @@ server <- function(input, output) {
     output$main_scales_down <- downloadHandler(
       filename = "main_scales_plot.png",
       content = function(file){
-        ggsave(file, device = "png", width=7, height=8)
+        ggsave(file, device = "png", width=7, height=5)
         
       })
     
