@@ -18,7 +18,7 @@ set.seed(12345)
 
 source("subtests.R")
 source("main_scales.R")
-source("bell_curve.R")
+#source("bell_curve.R")
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
@@ -119,67 +119,68 @@ server <- function(input, output) {
         ggsave(file, device = "png", width=7, height=5)
         
       })
+}
     
-    output$bell_curve_plot <- renderPlot({
+    #output$bell_curve_plot <- renderPlot({
       
       # put main scales in a dataframe
-      bell_curve_df <- data.frame(rbind(
-        input$vci_bell, input$pri_bell, input$wmi_bell, input$psi_bell, input$fsiq_bell)) %>%
-        tibble::rownames_to_column(var = "scale") %>%
-        rename(percentile = 2)
+      #bell_curve_df <- data.frame(rbind(
+        #input$vci_bell, input$pri_bell, input$wmi_bell, input$psi_bell, input$fsiq_bell)) %>%
+        #tibble::rownames_to_column(var = "scale") %>%
+        #rename(percentile = 2)
       
       # make ggplot labels
       #bell_curve_labels = c("VCI", "PRI", "WMI", "PSI", "FSIQ")
       
       # do stuff to make the plot easier
-      curve <- data.frame(score = seq(35, 165, 
-                                      length.out = 131))
+      #curve <- data.frame(score = seq(35, 165, 
+                                      #length.out = 131))
       
-      curve$y <- dnorm(curve$score, mean = 100, sd = 15)
+      #curve$y <- dnorm(curve$score, mean = 100, sd = 15)
       
-      curve <- curve %>%
-        mutate(classification = case_when(
-          score <= 69 ~ "Intellectual Disability",
-          score <= 79 ~ "Borderline",
-          score <= 89 ~ "Low Average",
-          score <= 109 ~ "Average",
-          score <= 119 ~ "High Average", 
-          score <= 129 ~ "Superior",
-          score > 129 ~ "Very Superior",
-          TRUE ~ NA_character_)
-        )
+      #curve <- curve %>%
+        #mutate(classification = case_when(
+          #score <= 69 ~ "Intellectual Disability",
+          #score <= 79 ~ "Borderline",
+          #score <= 89 ~ "Low Average",
+          #score <= 109 ~ "Average",
+          #score <= 119 ~ "High Average", 
+          #score <= 129 ~ "Superior",
+          #score > 129 ~ "Very Superior",
+          #TRUE ~ NA_character_)
+        #)
       
-      curve$classification <- factor(curve$classification, 
-                                     levels=c("Intellectual Disability",
-                                              "Borderline",
-                                              "Low Average",
-                                              "Average",
-                                              "High Average",
-                                              "Superior",
-                                              "Very Superior"))
+      #curve$classification <- factor(curve$classification, 
+                                     #levels=c("Intellectual Disability",
+                                              #"Borderline",
+                                              #"Low Average",
+                                              #"Average",
+                                              #"High Average",
+                                              #"Superior",
+                                              #"Very Superior"))
       
       # make the bell
-      ggplot(curve, aes(x = score, y = y, fill = classification)) + 
-        geom_ribbon(data = curve, aes(ymax = y), ymin = 0, alpha = 0.5) +
-        geom_line(color = "black") + 
-        theme_bw() + 
-        theme(legend.position = "bottom") +
-        scale_fill_manual(values = 
-                            c("red", "green", "blue", "yellow", "blue", "green", "red")) +
-        scale_y_continuous("", breaks=NULL) + 
-        scale_x_continuous("", breaks=NULL) +
-        geom_vline(data = bell_curve_df, aes(xintercept = as.numeric(percentile)))
+      #ggplot(curve, aes(x = score, y = y, fill = classification)) + 
+        #geom_ribbon(data = curve, aes(ymax = y), ymin = 0, alpha = 0.5) +
+        #geom_line(color = "black") + 
+        #theme_bw() + 
+        #theme(legend.position = "bottom") +
+        #scale_fill_manual(values = 
+                            #c("red", "green", "blue", "yellow", "blue", "green", "red")) +
+        #scale_y_continuous("", breaks=NULL) + 
+        #scale_x_continuous("", breaks=NULL) +
+        #geom_vline(data = bell_curve_df, aes(xintercept = as.numeric(percentile)))
       
-      })
+      #})
     
-    output$bell_curve_down <- downloadHandler(
-      filename = "bell_curve_plot.png",
-      content = function(file){
-        ggsave(file, device = "png", width=12, height=7)
+    #output$bell_curve_down <- downloadHandler(
+      #filename = "bell_curve_plot.png",
+      #content = function(file){
+        #ggsave(file, device = "png", width=12, height=7)
         
-      })
+      #})
     
-}
+#}
     
 
 # DO NOT ACTUALLY INLCLUDE THESE LINES IN THE FINAL PRODUCT!!!!

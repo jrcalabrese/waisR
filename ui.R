@@ -15,10 +15,10 @@ library(rsconnect)
 
 source("subtests.R")
 source("main_scales.R")
-source("bell_curve.R")
+#source("bell_curve.R")
 
 ui <- navbarPage("waisR by @jrosecalabrese", theme = shinytheme("flatly"),
                  subtests,
                  main_scales,
-                 bell_curve
+                 #bell_curve
 )

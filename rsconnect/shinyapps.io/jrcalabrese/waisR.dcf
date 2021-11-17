@@ -5,7 +5,7 @@ account: jrcalabrese
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5029549
-bundleId: 5245049
+bundleId: 5260306
 url: https://jrcalabrese.shinyapps.io/waisR/
-when: 1636739066.67325
-lastSyncTime: 1636739066.67327
+when: 1637110659.18289
+lastSyncTime: 1637110659.18291
