@@ -13,8 +13,8 @@ library(shinydashboard)
 library(shinythemes)
 
 # Define UI for application that draws various ggplots
-bell_curve <- tabPanel("Bell Curve (will fix later...)",
-                     titlePanel("Bell Curve"),
+bell_curve <- tabPanel("Normal Curve",
+                     titlePanel("Normal Curve"),
                      sidebarLayout(
                        sidebarPanel(
                          # Enter numbers

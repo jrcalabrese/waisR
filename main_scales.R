@@ -30,6 +30,8 @@ main_scales <- tabPanel("Main Scales",
     mainPanel(
       plotOutput(outputId = "main_scales_plot"),
       downloadButton(outputId = "main_scales_down", label = "Download the plot"),
+      checkboxInput("checkbox",label = "Enable colorbars for descriptive classifications", value = TRUE),
+      verbatimTextOutput("value"),
     )
   )
 )
