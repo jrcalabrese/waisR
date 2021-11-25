@@ -94,55 +94,61 @@ server <- function(input, output) {
       main_scales_df$gp <- c(1,1,1,1,
                              2,2,2)
       
+      # emulate ggplot2 color palette
+      ggcolor <- hue_pal()(7)
+      
       # make custom legend
       legend <- data.frame( 
         classification = c("Very Superior", "Superior", "High Average", "Average", "Low Average", "Borderline", "Intellectual Disability"),
-        color = c("#3B9AB2", "#78B7C5", "#EBCC2A", "#E1AF00", "#EBCC2A", "#78B7C5", "#3B9AB2"))
+        color = ggcolor)
       
       # make it a factor
       legend$classification <- factor(legend$classification, 
-                                     levels=c("Intellectual Disability",
-                                              "Borderline",
-                                              "Low Average",
-                                              "Average",
-                                              "High Average",
+                                     levels=c("Very Superior",
                                               "Superior",
-                                              "Very Superior"))
+                                              "High Average",
+                                              "Average",
+                                              "Low Average",
+                                              "Borderline",
+                                              "Intellectual Disability"))
       
       # make a ggplot
       main_scales_df %>%
         ggplot(aes(x=scale, y=as.numeric(scale_score), group=gp)) +
         theme_bw() +
-        geom_line(stat="identity",color="blue") + 
-        {if (input$checkbox == TRUE) geom_point(size=2, shape=15, aes(color = factor(legend$classification))) } +
-        {if (input$checkbox == TRUE) scale_color_manual(name = " ", values = c("#3B9AB2", "#78B7C5", "#EBCC2A", "#E1AF00", "#EBCC2A", "#78B7C5", "#3B9AB2")) } +
-        geom_point(color= "blue", fill="blue", shape=16, size=3) +
+        geom_line(stat="identity",color="black") + 
+        {if (input$checkbox == TRUE) geom_point(size=3, shape=15, aes(color = factor(legend$classification))) } +
+        {if (input$checkbox == TRUE) scale_color_manual(name = " ", values = ggcolor) } +
+        geom_point(color= "blue", fill="blue", shape=16, size=4) +
+        # The shape of the circles must always be bigger than the shape of the square
         geom_vline(xintercept = 4.5) +
         geom_vline(xintercept = 9.5) +
         geom_vline(xintercept = 12.5) +
         ## Color Bars
+        ### *** Note to people who might see this: let me know if I should change these colors! I have no idea what to use, 
+        ### *** so I went with the default ggplot2 color palette, which is a good default color palette. 
         # Very Superior
         {if (input$checkbox == TRUE) geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 130, ymax = 139),
-                                               alpha = 0.06, fill = "#3B9AB2") } +
+                                               alpha = 0.06, fill = "#F8766D") } +
         # Superior
         {if (input$checkbox == TRUE) geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 120, ymax = 129),
-                                               alpha = 0.06, fill = "#78B7C5") } +
+                                               alpha = 0.06, fill = "#C49A00") } +
         # High Average
         {if (input$checkbox == TRUE) geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 110, ymax = 119),
-                                               alpha = 0.06, fill = "#EBCC2A") } +
+                                               alpha = 0.06, fill = "#53B400") } +
         # Average
         {if (input$checkbox == TRUE) geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 90, ymax = 109),
-                                               alpha = 0.06, fill = "#E1AF00") } +
+                                               alpha = 0.06, fill = "#00C094") } +
         # Low Average
         {if (input$checkbox == TRUE) geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 80, ymax = 89),
-                                               alpha = 0.06, fill = "#EBCC2A") } +
+                                               alpha = 0.06, fill = "#00B6EB") } +
         # Borderline
         {if (input$checkbox == TRUE) geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 70, ymax = 79),
-                                               alpha = 0.06, fill = "#78B7C5") } +
+                                               alpha = 0.06, fill = "#A58AFF") } +
         # Intellectual Disability
         {if (input$checkbox == TRUE) geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = 60, ymax = 69),
-                                               alpha = 0.06, fill = "#3B9AB2") } +
-          ##### *** Instead of shaded boxes, just dotted lines!?????
+                                               alpha = 0.06, fill = "#FB61D7") } +
+          # *** Use dotted lines instead of shaded rectangles? Maybe in future.
         ## Custom Legend
         scale_y_continuous(breaks = (seq(35, 165, by = 5)), limits = c(35,165)) +
         scale_x_discrete(position = "top", labels = unique(main_scale_labels)) +
@@ -237,7 +243,7 @@ server <- function(input, output) {
                                                                                                                     ifelse(input$vci_bell < 109, "Average",
                                                                                                                            ifelse(input$vci_bell < 119, "High Average",
                                                                                                                                   ifelse(input$vci_bell < 129, "Superior",
-                                                                                                                                         ifelse(input$vci_bell < 165, "Very Superior")
+                                                                                                                                         ifelse(input$vci_bell < 166, "Very Superior")
                                                                                                                                          ))))))), ")")) +
       annotate("label", x = input$pri_bell, y = .019, label = paste0("PRI = ", input$pri_bell, "\n(", (ifelse(input$pri_bell < 69, "Intellectual Disability",
                                                                                                              ifelse(input$pri_bell < 79, "Borderline",
@@ -245,7 +251,7 @@ server <- function(input, output) {
                                                                                                                            ifelse(input$pri_bell < 109, "Average",
                                                                                                                                   ifelse(input$pri_bell < 119, "High Average",
                                                                                                                                          ifelse(input$pri_bell < 129, "Superior",
-                                                                                                                                                ifelse(input$pri_bell < 165, "Very Superior")
+                                                                                                                                                ifelse(input$pri_bell < 166, "Very Superior")
                                                                                                                                          ))))))), ")")) +
       annotate("label", x = input$wmi_bell, y = .015, label = paste0("WMI = ", input$wmi_bell, "\n(", (ifelse(input$wmi_bell < 69, "Intellectual Disability",
                                                                                                              ifelse(input$wmi_bell < 79, "Borderline",
@@ -253,7 +259,7 @@ server <- function(input, output) {
                                                                                                                            ifelse(input$wmi_bell < 109, "Average",
                                                                                                                                   ifelse(input$wmi_bell < 119, "High Average",
                                                                                                                                          ifelse(input$wmi_bell < 129, "Superior",
-                                                                                                                                                ifelse(input$wmi_bell < 165, "Very Superior")
+                                                                                                                                                ifelse(input$wmi_bell < 166, "Very Superior")
                                                                                                                                          ))))))), ")")) +
       annotate("label", x = input$psi_bell, y = .011, label = paste0("PSI = ", input$psi_bell, "\n(", (ifelse(input$psi_bell < 69, "Intellectual Disability",
                                                                                                              ifelse(input$psi_bell < 79, "Borderline",
@@ -261,7 +267,7 @@ server <- function(input, output) {
                                                                                                                            ifelse(input$psi_bell < 109, "Average",
                                                                                                                                   ifelse(input$psi_bell < 119, "High Average",
                                                                                                                                          ifelse(input$psi_bell < 129, "Superior",
-                                                                                                                                                ifelse(input$psi_bell < 165, "Very Superior")
+                                                                                                                                                ifelse(input$psi_bell < 166, "Very Superior")
                                                                                                                                          ))))))), ")")) +
       annotate("label", x = 45, y = .005, size=6, label = paste0("FSIQ = ", input$fsiq_bell, "\n(", (ifelse(input$fsiq_bell < 69, "Intellectual Disability",
                                                                                                               ifelse(input$fsiq_bell < 79, "Borderline",
@@ -269,7 +275,7 @@ server <- function(input, output) {
                                                                                                                             ifelse(input$fsiq_bell < 109, "Average",
                                                                                                                                    ifelse(input$fsiq_bell < 119, "High Average",
                                                                                                                                           ifelse(input$fsiq_bell < 129, "Superior",
-                                                                                                                                                 ifelse(input$fsiq_bell < 165, "Very Superior")
+                                                                                                                                                 ifelse(input$fsiq_bell < 166, "Very Superior")
                                                                                                                                           ))))))), ")"))
     
     })
